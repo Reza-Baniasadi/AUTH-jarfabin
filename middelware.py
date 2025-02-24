@@ -8,3 +8,8 @@ from auth import create_access_token, verify_password, hash_password, decode_acc
 from config import settings
 from utils import logger, is_rate_limited
 import httpx
+
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Secure Crypto API")
