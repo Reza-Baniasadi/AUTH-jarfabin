@@ -13,3 +13,14 @@ import httpx
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Secure Crypto API")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+origins = ["https://yourfrontend.com"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Authorization", "Content-Type"],
+)
