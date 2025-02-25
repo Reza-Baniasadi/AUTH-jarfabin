@@ -24,3 +24,16 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+
+@app.middleware("http")
+async def secure_headers(request: Request, call_next):
+    ip = request.client.host
+    if is_rate_limited(ip):
+        raise HTTPException(status_code=429, detail="Too many requests")
+
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
