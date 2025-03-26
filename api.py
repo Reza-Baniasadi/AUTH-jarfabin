@@ -29,3 +29,6 @@ def get_current_user(token: str = Depends(models.oauth2_scheme), db: Session = D
 @router.get("/me", response_model=schemas.UserResponse)
 def read_current_user(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+
+    
