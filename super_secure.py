@@ -6,7 +6,13 @@ from database import get_db
 import crud
 from config import settings
 import redis, logging
+from fastapi import APIRouter, Depends
+import models
 
+redis_client = redis.StrictRedis.from_url(settings.REDIS_URL, decode_responses=True)
+
+logger = logging.getLogger("super_secure")
+logger.setLevel(logging.INFO)
 
 def super_secure_dependency(required_roles: list = [], endpoint_salt: str = "default"):
 
@@ -48,3 +54,15 @@ def super_secure_dependency(required_roles: list = [], endpoint_salt: str = "def
 
         return user
     return dependency
+
+
+
+router = APIRouter(prefix="/api", tags=["secure"])
+
+@router.post("/admin-action")
+def admin_action(current_user: models.User = Depends(super_secure_dependency(required_roles=["admin"], endpoint_salt="admin-action"))):
+    return {"msg": f"Admin {current_user.email} executed action safely!"}
+
+@router.post("/user-action")
+def user_action(current_user: models.User = Depends(super_secure_dependency(required_roles=["user","admin"], endpoint_salt="user-action"))):
+    return {"msg": f"User {current_user.email} executed action safely!"}
