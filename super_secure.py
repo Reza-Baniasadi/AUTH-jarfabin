@@ -14,6 +14,7 @@ redis_client = redis.StrictRedis.from_url(settings.REDIS_URL, decode_responses=T
 logger = logging.getLogger("super_secure")
 logger.setLevel(logging.INFO)
 
+
 def super_secure_dependency(required_roles: list = [], endpoint_salt: str = "default"):
 
     async def dependency(request: Request, token: str, db: Session = Depends(get_db)):
