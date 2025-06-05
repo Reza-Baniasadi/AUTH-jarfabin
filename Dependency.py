@@ -25,3 +25,24 @@ def pid_secure(required_roles: list = []):
         user = crud.get_user_by_email(db, email=email)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+        
+        if required_roles and user.role not in required_roles:
+            raise HTTPException(status_code=403, detail="Insufficient privileges")
+
+        pid = str(uuid.uuid4())
+        _active_pids[pid] = {
+            "user_email": email,
+            "start_time": time.time(),
+            "endpoint": request.url.path
+        }
+
+        logger.info(f"PID {pid} - User {email} accessed {request.url.path}")
+
+        def revoke():
+            if pid in _active_pids:
+                logger.warning(f"PID {pid} revoked for user {email}")
+                _active_pids.pop(pid)
+
+        return {"user": user, "pid": pid, "revoke": revoke}
+
+    return dependency
