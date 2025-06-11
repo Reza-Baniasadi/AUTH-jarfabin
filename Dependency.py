@@ -8,7 +8,6 @@ import logging
 from fastapi import APIRouter, Depends
 
 
-
 logger = logging.getLogger("pid_secure")
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
