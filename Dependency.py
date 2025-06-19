@@ -5,6 +5,9 @@ import crud, models
 from database import get_db
 from auth import decode_access_token
 import logging
+from fastapi import APIRouter, Depends
+
+
 
 logger = logging.getLogger("pid_secure")
 logger.setLevel(logging.INFO)
@@ -46,3 +49,17 @@ def pid_secure(required_roles: list = []):
         return {"user": user, "pid": pid, "revoke": revoke}
 
     return dependency
+
+
+
+
+router = APIRouter(prefix="/pid", tags=["pid-secure"])
+
+@router.get("/data")
+def secure_data(session=Depends(pid_secure(required_roles=["user","admin"]))):
+    user = session["user"]
+    pid = session["pid"]
+    revoke = session["revoke"]
+
+
+    return {"msg": f"Hello {user.email}, your session PID is {pid}"}
